@@ -1,0 +1,14 @@
+database:
+    name: "database_name"
+    host: "localhost"
+    port: "5432"
+    user: "postgres"
+    password: "your_password"
+
+handler:
+    api_version: "1.0"
+    port: ":8080"
+
+platform:
+    url: "url"
+    ssl_path: "./ssl/client.crt"
