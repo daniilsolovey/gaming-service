@@ -110,48 +110,38 @@ func (handler *Handler) CreatePlayer(context *gin.Context) {
 	player, err := handler.requester.CreatePlayer()
 	if err != nil {
 		log.Error(err)
+		return
 	}
 
-	player = &requester.ResponseCreatePlayer{}
-	player.ID = 1928822491
-	player.JSONRPC = "2.0"
-	log.Info("player created: ", player)
-
-	err = handler.database.InsertPlayer(*player, 113.12)
+	playerBalance := 113.12
+	err = handler.database.InsertPlayer(*player, playerBalance)
 	if err != nil {
 		log.Error(err)
+		return
 	}
 
+	log.Info("player created: ", player)
 	context.IndentedJSON(http.StatusOK, player)
-
 }
 
 func (handler *Handler) CreateBankGroup(context *gin.Context) {
 	bankGroup, err := handler.requester.CreateBankGroup()
 	if err != nil {
 		log.Error(err)
+		return
 	}
 
-	bankGroup = &requester.ResponseBankGroup{}
-	bankGroup.ID = 1225625456
-	bankGroup.JSONRPC = "2.0"
 	log.Info("bankGroup created: ", bankGroup)
 	context.IndentedJSON(http.StatusOK, bankGroup)
-
 }
 
 func (handler *Handler) CreateSession(context *gin.Context) {
 	session, err := handler.requester.CreateSession()
 	if err != nil {
 		log.Error(err)
+		return
 	}
 
-	session = &requester.ResponseSession{}
-	session.ID = 321864203
-	session.JSONRPC = "2.0"
-	sessionResult := &requester.SessionResult{SessionID: "exampleSession", SessionURL: "exampleURL"}
-	session.Result = append(session.Result, *sessionResult)
 	log.Info("session created: ", session)
 	context.IndentedJSON(http.StatusOK, session)
-
 }

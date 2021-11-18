@@ -2,12 +2,8 @@ package requester
 
 import (
 	"bytes"
-	"crypto/tls"
-	"crypto/x509"
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
-	"time"
 
 	"github.com/daniilsolovey/gaming-task/internal/config"
 	"github.com/reconquest/karma-go"
@@ -37,7 +33,8 @@ const (
 		"params": {
 		"PlayerId": "noname",
 		"GameId": "bennys_the_biggest_game" }
-		}`
+		}
+`
 )
 
 type ResponseCreatePlayer struct {
@@ -53,25 +50,26 @@ type ResponseBankGroup struct {
 }
 
 type ResponseSession struct {
-	JSONRPC string          `json:"jsonrpc"`
-	ID      int             `json:"id"`
-	Result  []SessionResult `json:"result"`
-}
-
-type SessionResult struct {
-	SessionID  string `json:"sessionId"`
-	SessionURL string `json:"sessionUrl"`
+	JSONRPC string `json:"jsonrpc"`
+	ID      int    `json:"id"`
+	Result  struct {
+		SessionID  string `json:"sessionId"`
+		SessionURL string `json:"sessionUrl"`
+	} `json:"result"`
 }
 
 type Requester struct {
 	config *config.Config
+	client *http.Client
 }
 
 func NewRequester(
 	config *config.Config,
+	client *http.Client,
 ) *Requester {
 	return &Requester{
 		config: config,
+		client: client,
 	}
 }
 
@@ -117,16 +115,7 @@ func (requester *Requester) CreatePlayer() (*ResponseCreatePlayer, error) {
 
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("Accept", "application/json")
-
-	client, err := requester.setupClient()
-	if err != nil {
-		return nil, karma.Format(
-			err,
-			"unable to setup client for request by url: %s", url,
-		)
-	}
-
-	response, err := client.Do(request)
+	response, err := requester.client.Do(request)
 	if err != nil {
 		return nil, karma.Format(
 			err,
@@ -172,15 +161,7 @@ func (requester *Requester) CreateBankGroup() (*ResponseBankGroup, error) {
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("Accept", "application/json")
 
-	client, err := requester.setupClient()
-	if err != nil {
-		return nil, karma.Format(
-			err,
-			"unable to setup client for request by url: %s", url,
-		)
-	}
-
-	response, err := client.Do(request)
+	response, err := requester.client.Do(request)
 	if err != nil {
 		return nil, karma.Format(
 			err,
@@ -226,15 +207,7 @@ func (requester *Requester) CreateSession() (*ResponseSession, error) {
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("Accept", "application/json")
 
-	client, err := requester.setupClient()
-	if err != nil {
-		return nil, karma.Format(
-			err,
-			"unable to setup client for request by url: %s", url,
-		)
-	}
-
-	response, err := client.Do(request)
+	response, err := requester.client.Do(request)
 	if err != nil {
 		return nil, karma.Format(
 			err,
@@ -255,29 +228,4 @@ func (requester *Requester) CreateSession() (*ResponseSession, error) {
 	}
 
 	return &result, nil
-}
-
-func (requester *Requester) setupClient() (*http.Client, error) {
-	caCert, err := ioutil.ReadFile(requester.config.SSLPath)
-	if err != nil {
-		return nil, karma.Format(
-			err,
-			"unable to read ssl by path:% s",
-			requester.config.SSLPath,
-		)
-	}
-
-	caCertPool := x509.NewCertPool()
-	caCertPool.AppendCertsFromPEM(caCert)
-	client := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				RootCAs: caCertPool,
-			},
-		},
-
-		Timeout: 1 * time.Minute,
-	}
-
-	return client, nil
 }

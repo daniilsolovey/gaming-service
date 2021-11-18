@@ -20,7 +20,8 @@ type Handler struct {
 
 type Platform struct {
 	URL     string `yaml:"url" required:"true"`
-	SSLPath string `yaml:"ssl_path" required:"true"`
+	SSLPathPem string `yaml:"ssl_path_pem" required:"true"`
+	SSLPathKey string `yaml:"ssl_path_key" required:"true"`
 }
 
 type Config struct {

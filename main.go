@@ -1,6 +1,10 @@
 package main
 
 import (
+	"crypto/tls"
+	"net/http"
+	"time"
+
 	"github.com/daniilsolovey/gaming-task/internal/config"
 	"github.com/daniilsolovey/gaming-task/internal/database"
 	"github.com/daniilsolovey/gaming-task/internal/handler"
@@ -67,8 +71,38 @@ func main() {
 		log.Fatal(err)
 	}
 
-	requester := requester.NewRequester(config)
+	client, err := createClient(config)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	requester := requester.NewRequester(config, client)
 
 	newHandler := handler.NewHandler(database, config, requester)
 	newHandler.StartServer(config)
+}
+
+func createClient(config *config.Config) (*http.Client, error) {
+	cert, err := tls.LoadX509KeyPair(config.SSLPathPem, config.SSLPathKey)
+	if err != nil {
+		return nil, karma.Format(
+			err,
+			"unable to read ssl by path:% s",
+			config.SSLPathPem,
+		)
+
+	}
+
+	client := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				Certificates:       []tls.Certificate{cert},
+				InsecureSkipVerify: true,
+			},
+		},
+
+		Timeout: 1 * time.Minute,
+	}
+
+	return client, nil
 }
