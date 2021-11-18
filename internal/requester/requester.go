@@ -40,13 +40,13 @@ const (
 type ResponseCreatePlayer struct {
 	JSONRPC string   `json:"jsonrpc"`
 	ID      int      `json:"id"`
-	Result  []string `json:"result"`
+	Result  struct{} `json:"result"`
 }
 
 type ResponseBankGroup struct {
 	JSONRPC string   `json:"jsonrpc"`
 	ID      int      `json:"id"`
-	Result  []string `json:"result"`
+	Result  struct{} `json:"result"`
 }
 
 type ResponseSession struct {
@@ -79,32 +79,11 @@ type RequesterInterface interface {
 	CreateSession() (*ResponseSession, error)
 }
 
-func prepareBody(textBody string) ([]byte, error) {
-	var jsonData []byte
-	jsonData, err := json.Marshal(textBody)
-	if err != nil {
-		return nil, karma.Format(
-			err,
-			"unable to marshal text_body with: %s",
-			textBody,
-		)
-	}
-
-	return jsonData, nil
-}
-
 func (requester *Requester) CreatePlayer() (*ResponseCreatePlayer, error) {
 	log.Info("creating player on platform")
 	url := requester.config.Platform.URL
-	requestBody, err := prepareBody(CREATE_PLAYER_REQUEST_BODY)
-	if err != nil {
-		return nil, karma.Format(
-			err,
-			"unable to prepare text_body for create_player request",
-		)
-	}
 
-	request, err := http.NewRequest("POST", url, bytes.NewBuffer(requestBody))
+	request, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(CREATE_PLAYER_REQUEST_BODY)))
 	if err != nil {
 		return nil, karma.Format(
 			err,
@@ -141,15 +120,8 @@ func (requester *Requester) CreatePlayer() (*ResponseCreatePlayer, error) {
 func (requester *Requester) CreateBankGroup() (*ResponseBankGroup, error) {
 	log.Info("creating bank_group on platform")
 	url := requester.config.Platform.URL
-	requestBody, err := prepareBody(CREATE_BANK_GROUP_REQUEST_BODY)
-	if err != nil {
-		return nil, karma.Format(
-			err,
-			"unable to prepare text_body for bank_group request",
-		)
-	}
 
-	request, err := http.NewRequest("POST", url, bytes.NewBuffer(requestBody))
+	request, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(CREATE_BANK_GROUP_REQUEST_BODY)))
 	if err != nil {
 		return nil, karma.Format(
 			err,
@@ -187,15 +159,8 @@ func (requester *Requester) CreateBankGroup() (*ResponseBankGroup, error) {
 func (requester *Requester) CreateSession() (*ResponseSession, error) {
 	log.Info("creating session on platform")
 	url := requester.config.Platform.URL
-	requestBody, err := prepareBody(CREATE_SESSION_REQUEST_BODY)
-	if err != nil {
-		return nil, karma.Format(
-			err,
-			"unable to prepare text_body for session request",
-		)
-	}
 
-	request, err := http.NewRequest("POST", url, bytes.NewBuffer(requestBody))
+	request, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(CREATE_SESSION_REQUEST_BODY)))
 	if err != nil {
 		return nil, karma.Format(
 			err,

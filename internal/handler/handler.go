@@ -70,6 +70,7 @@ func (handler *Handler) GetPlayerBalanceForPlatform(context *gin.Context) {
 		context.IndentedJSON(http.StatusNotFound, gin.H{"message": "player not found"})
 		return
 	}
+
 	var response BalanceResponse
 	response.ID = playerID
 	response.JSONRPC = "2.0"

@@ -49,15 +49,3 @@ const (
 	WHERE player.player_id = $2;
 	`
 )
-
-// SQL_CREATE_TABLE_PLAYER = `
-// CREATE TABLE IF NOT EXISTS
-// player(
-// 	id serial PRIMARY KEY,
-// 	player_id VARCHAR(50),
-// 	nick_name VARCHAR(50),
-// 	bank_group_id VARCHAR(50),
-// 	balance DECIMAL,
-// 	FOREIGN KEY (bank_group_id) REFERENCES bank_group (id)
-// );
-// `
