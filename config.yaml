@@ -10,5 +10,6 @@ handler:
     port: ":8080"
 
 platform:
-    url: "url"
-    ssl_path: "./ssl/client.crt"
+    url: "platform_url"
+    ssl_path_pem: "./ssl/apikey.pem"
+    ssl_path_key: "./ssl/client.key"
